@@ -1,0 +1,19 @@
+#!/bin/bash
+echo "Saving the Palworld server world"
+screen -S palworld_server -X stuff "save-all$(printf \\r)"  # Send the save command to the server
+echo "Waiting for the server to save the world"
+sleep 60  # Allow time for the server to save the world
+
+echo "Terminating any existing palworld_server screen sessions"
+screen -ls | grep palworld_server | cut -d. -f1 | awk '{print $1}' | xargs -I {} screen -S {} -X quit
+
+echo "Waiting for the existing server to shut down gracefully"
+sleep 60  # Allow time for the server to shut down gracefully
+
+# Change the working directory to the PalServer directory
+cd /home/newuseracc/Steam/steamapps/common/PalServer
+
+sleep 5
+echo "Starting the Palworld server in a new screen session"
+screen -S palworld_server -d -m ./PalServer.sh  # Create a new screen session and start the server
+
